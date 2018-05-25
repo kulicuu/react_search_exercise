@@ -1,3 +1,14 @@
 {
-    "dependencies"
+    "dependencies": {
+        "async": "latest",
+        "bluebird": "latest",
+        "coffee-loader": "latest",
+        "immutable": "latest",
+        "lodash": "latest",
+        "react": "latest",
+        "redux": "latest",
+        "redux-immutable": "latest",
+        "redux-thunk": "latest",
+        "shortid": "latest"
+    }
 }
