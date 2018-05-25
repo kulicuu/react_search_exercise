@@ -7,7 +7,7 @@ aa = {}
 
 aa['primus:data'] = ({ state, action, effects_q }) ->
     # c action.payload.data.payload
-    state.set 'results', Imm.Map(action.payload.data.payload)
+    state = state.set 'results', Imm.Map(action.payload.data.payload)
     state
 
 

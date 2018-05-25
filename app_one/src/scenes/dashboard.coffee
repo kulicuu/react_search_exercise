@@ -3,6 +3,80 @@
 
 
 
+span_0_style =
+    fontSize: 10
+    maxWidth: '20%'
+    width: '20%'
+    marginRight: 30
+
+
+span_1_style = fp.assign span_0_style,
+    color: 'white'
+    fontSize: 12
+
+results_comp = ->
+    # c @props.results
+    res = @props.results.toArray()
+    div
+        style:
+            backgroundColor: 'lightblue'
+            width: '100%'
+            # height: '100%'
+            display: 'flex'
+            flexDirection: 'column'
+        # @props.results.map (entry, id) =>
+        #     c entry, 'entry'
+        div
+            style:
+                display: 'flex'
+                flexDirection: 'row'
+                justifyContent: 'space-between'
+                width: '100%'
+                height: '10%'
+            span
+                style: span_1_style
+                "Title"
+            span
+                style: span_1_style
+                "Gtin"
+            span
+                style: span_1_style
+                "Gender"
+            span
+                style: span_1_style
+                "Sale Price"
+            span
+                style: span_1_style
+                "Price"
+
+        res.map (entry, id) ->
+            c entry
+            div
+                key: "entry:#{id}"
+            # div
+            #     key: "entry:#{id}"
+                style:
+                    display: 'flex'
+                    flexDirection: 'row'
+                    justifyContent: 'space-between'
+                    width: '100%'
+                    height: '10%'
+                span
+                    style: span_0_style
+                    entry.title
+                span
+                    style: span_0_style
+                    entry.gtin
+                span
+                    style: span_0_style
+                    entry.gender
+                span
+                    style: span_0_style
+                    entry.sale_price
+                span
+                    style: span_0_style
+                    entry.price
+
 
 
 
@@ -16,16 +90,18 @@ comp = rr
         div
             style:
                 width: '100%'
-                height: '100%'
+                # height: '100%'
                 display: 'flex'
                 flexDirection: 'column'
-                backgroundColor: 'beige'
+                backgroundColor: 'ivory'
                 justifyContent: 'center'
                 alignItems: 'center'
             div
+
                 style:
+                    marginTop: 40
                     width: '80%'
-                    height: '20%'
+                    # height: '20%'
                     display: 'flex'
                     flexDirection: 'row'
                 select
@@ -68,16 +144,19 @@ comp = rr
                             search_type: @state.search_type
                     style:
                         width: '70%'
-                        height: '30%'
+                        height: 40
+                        marginBottom: 40
                     type: 'text'
                     placeholder: 'search_string'
-
+            results_comp.bind(@)()
 
 
 
 
 map_state_to_props = (state) ->
-    lookup: state.get('lookup')
+    # lookup: state.get('lookup')
+    c (state.getIn ['lookup', 'results']), 'results'
+    results: state.getIn ['lookup', 'results']
 
 map_dispatch_to_props = (dispatch) ->
     send_search: ({ search_str, search_type }) ->
