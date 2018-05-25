@@ -3,17 +3,27 @@
 aa = {}
 
 
-keys_aa = _.includes aa
+
+
+aa['primus:data'] = ({ state, action, effects_q }) ->
+    # c action.payload.data.payload
+    state.set 'results', Imm.Map(action.payload.data.payload)
+    state
+
+
+aa.api_sc = ({ state, action, effects_q }) ->
+    effects_q.push
+        type: 'api_sc'
+        payload: action.payload
+    state
+
+keys_aa = _.keys aa
 
 
 lookup_precursor = ({ effects_q }) ->
-# lookup = (state, action) ->
     (state, action) ->
-        # c 'into reducer with state', state
-        # c 'and action', action
         if _.includes(keys_aa, action.type)
             aa[action.type] { state, action, effects_q }
-            # aa[action.type] { state, action }
         else
             c "No-op in updates/reducers with type", action.type
             # NOTE : Better not to log this in production.

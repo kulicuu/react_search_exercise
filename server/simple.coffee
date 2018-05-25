@@ -47,6 +47,8 @@ a1_primus.on 'connection', (spark) ->
         spark: spark
 
     spark.on 'data', (data) ->
-        c color.cyan 'SPARK HAS DATA', on
+        # c color.cyan 'SPARK HAS DATA', on
         { type, payload } = data
+        # c 'type', type
+        # c 'payload', payload
         api { type, payload, spark }

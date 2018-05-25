@@ -10,6 +10,7 @@ thunk = require('redux-thunk').default
 initial_state = Imm.Map
     lookup: Imm.Map
         placeholder: 43
+        results: Imm.Map {}
 
 
 effects_q = [
