@@ -3,12 +3,21 @@
         "async": "latest",
         "bluebird": "latest",
         "coffee-loader": "latest",
+        "coffeescript": "latest",
+        "create-react-class": "latest",
         "immutable": "latest",
         "lodash": "latest",
         "react": "latest",
+        "react-dom": "latest",
+        "react-dom-factories": "latest",
+        "react-redux": "latest",
         "redux": "latest",
         "redux-immutable": "latest",
         "redux-thunk": "latest",
         "shortid": "latest"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "watch": "./node_modules/.bin/webpack-cli --watch"
     }
 }
