@@ -6,8 +6,8 @@
 dashboard = rc require('../scenes/dashboard.coffee').default
 
 render = ->
-    c 'into'
     dashboard()
+
 
 comp = rr
     render: render

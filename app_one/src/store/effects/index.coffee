@@ -4,15 +4,9 @@ aa = {}
 
 
 
-
 keys_aa = _.keys aa
-
-
-
-
-
 effects_precursor = ({ store }) ->
-    ({ effects_q }) ->
+    ({ effects_q })->
         if effects_q.length > 0
             _.map effects_q, (effect, idx) ->
                 etype = effect.type
@@ -22,3 +16,7 @@ effects_precursor = ({ store }) ->
                 else
                     c 'No-op in effects with type:', etype
                     # Don't log this in production.
+
+
+
+exports.default = effects_precursor

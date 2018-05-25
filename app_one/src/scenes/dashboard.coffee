@@ -22,7 +22,7 @@ comp = rr
     #     hovering: -1
 
     render: ->
-        div null, "hello"
+        div null, "dashboard"
             # # className: "home"
             # for idx in [0 .. 100]
             #     div
