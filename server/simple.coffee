@@ -36,7 +36,17 @@ a1_server.listen port, ->
 
 
 
+api = require('./api.coffee').default
+
 a1_primus.on 'connection', (spark) ->
     c color.purple 'PRIMUS HAS CONNECTION', on
+
+    api
+        type: 'init_spark'
+        payload: "just the spark"
+        spark: spark
+
     spark.on 'data', (data) ->
         c color.cyan 'SPARK HAS DATA', on
+        { type, payload } = data
+        api { type, payload, spark }

@@ -15,6 +15,10 @@ aa.init_primus = ({ effect, store }) ->
             payload: { data }
 
 
+    primus.write
+        type: 'checkin'
+
+
 
 keys_aa = _.keys aa
 effects_precursor = ({ store }) ->
