@@ -8,10 +8,8 @@ thunk = require('redux-thunk').default
 
 
 initial_state = Imm.Map
-    placeholder: 43
-
-c 'initial_state', initial_state
-
+    lookup: Imm.Map
+        placeholder: 43
 
 
 effects_q = [
@@ -22,18 +20,15 @@ effects_q = [
 
 
 lookup = require('./reducers/lookup.coffee').default { effects_q }
-# lookup = require('./reducers/lookup.coffee').default
 
 
 reducers = { lookup }
 
 
-store = createStore(lookup, initial_state, applyMiddleware(thunk))
-c 'store', store
+store = createStore(combineReducers(reducers), initial_state, applyMiddleware(thunk))
+
 
 effects = require('./effects/index.coffee').default { store }
-
-
 
 
 effect_trigger = ->

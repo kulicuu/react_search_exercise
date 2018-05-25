@@ -2,6 +2,7 @@ path = require 'path'
 
 
 module.exports =
+    mode: 'development'
     entry: "./src/entry.coffee"
     output:
         path: path.resolve(__dirname, "public", "js")

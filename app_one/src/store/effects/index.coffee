@@ -4,6 +4,18 @@ aa = {}
 
 
 
+aa.api_sc = ({ effect, store }) ->
+    primus.write effect.payload
+
+
+aa.init_primus = ({ effect, store }) ->
+    primus.on 'data', (data) ->
+        store.dispatch
+            type: 'primus:data'
+            payload: { data }
+
+
+
 keys_aa = _.keys aa
 effects_precursor = ({ store }) ->
     ({ effects_q })->
