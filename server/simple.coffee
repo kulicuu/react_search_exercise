@@ -31,10 +31,12 @@ a1_primus.save path.join(public_dir, '/js', '/primus.js')
 
 
 
-
-
-
-
-
 a1_server.listen port, ->
     c color.blue("Server listening on: #{port}")
+
+
+
+a1_primus.on 'connection', (spark) ->
+    c color.purple 'PRIMUS HAS CONNECTION', on
+    spark.on 'data', (data) ->
+        c color.cyan 'SPARK HAS DATA', on
