@@ -14,7 +14,6 @@ bb.res_std_search = ({ payload }) ->
 keys_bb = _.keys bb
 
 
-
 server_msg_api = ({ type, payload }) ->
     if _.includes(keys_bb, type)
         bb[type] { payload }
@@ -57,7 +56,6 @@ lookup_precursor = ({ effects_q }) ->
             c "No-op in updates/reducers with type", action.type
             # NOTE : Better not to log this in production.
             state
-
 
 
 exports.default = lookup_precursor

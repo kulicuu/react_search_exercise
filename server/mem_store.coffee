@@ -1,3 +1,4 @@
+# { title, gtin, gender, sale_price, price, image_link, additional_image_link }
 
 
 c = console.log.bind console
@@ -8,25 +9,20 @@ fs = require 'fs'
 fork = require('child_process').fork
 flow = require 'async'
 path = require 'path'
-
+shortid = require 'shortid'
 
 
 raw_data = fs.readFileSync './products.csv', 'utf8'
-
-
 rayy = raw_data.split('\n')
-# c rayy[0]
 rayy.shift()
 
-# c rayy[0]
+tree_worker = null # scoped here
 
 
 
-arq = {}
 
-# create_record = ({ title, gtin, gender, sale_price, price, image_link, additional_image_link }) ->
+spark_check = {}
 
-# { title, gtin, gender, sale_price, price, image_link, additional_image_link }
 
 
 
@@ -40,74 +36,24 @@ arq = rayy.reduce (acc, line, idx) ->
 c (_.size arq), 'size arq'
 
 
-# now we want to compute autocomplete tree for every column.   It's not going to be a more powerful feature (actually less) than the string includes running through the thing linearly, but it's
-# massively more performant.  In the real world we'd use something like Elasticsearch, or if
-# we need to demonstrate CS fundamentals we'd implement something similar from scratch.
-# start with title:
+dd = {}
 
 
+dd.progress_update = ({ payload }) ->
+    { perc_count, spark_ref } = payload
+    c 'progress_update', perc_count
+    spark = spark_check[spark_ref]
+    if spark
+        spark.write
+            type: 'progress_update_prefix_tree_build'
+            payload: perc_count
 
 
+dd.match_report = ({ payload }) ->
+    { match_set } = payload
 
 
-
-# This is if we will just have one entry returned, but we could also
-# use this method to return a bunch of answers in a way that would
-# work much faster over large data sets.
-map_prefix_to_match = ({ dictionary, prefix }) ->
-    candidates = []
-    for word in dictionary
-        if word.indexOf(prefix) is 0
-            candidates.push word
-        if candidates.length > 1
-            # break_ties { candidates }
-            candides.pop()
-        else
-            candides.pop()
-
-
-map_substring_to_match = ({ dictionary, partial_str }) ->
-    dictionary.reduce (candidates, word, idx) ->
-        unless word is undefined
-            if (word.indexOf partial_str) > -1
-                candidates.push word
-        candidates
-    , []
-
-
-
-# tree_lib = _.reduce [ 'title', 'gtin', 'gender', 'sale_price', 'price', 'image_link', 'additional_image_link' ], (acc33, field, idx33) ->
-#     the_dictionary = _.reduce arq, (acc, entry, id) ->
-#         acc.push entry[field]
-#         acc
-#     , []
-#
-#     tree =
-#         key: []
-#         chd_nodes: {}
-#         match_words: []
-#
-#     the_dictionary.map (word, idx) ->
-#         c field, word
-#         unless word is undefined
-#             rayy = word.split ''
-#             cursor_key = []
-#             rayy.map (char, idx2) ->
-#                 cursor_key.push char
-#                 _.reduce cursor_key, (acc, char2, idx2) ->
-#                     if not acc.chd_nodes[char2]
-#                         acc.chd_nodes[char2] =
-#                             key: cursor_key
-#                             chd_nodes: {}
-#                             match_words: map_substring_to_match
-#                                 dictionary: the_dictionary
-#                                 partial_str: cursor_key.join ''
-#                     acc = acc.chd_nodes[char2]
-#                     acc
-#                 , tree
-#     acc33[field] = tree
-#     acc33
-# , {}
+keys_worker_res_api = _.keys dd
 
 
 
@@ -123,12 +69,32 @@ map_substring_to_match = ({ dictionary, partial_str }) ->
 
 
 
-worker_res_api = {}
+
+cc = {}
+
+
+cc.build_tree = ({ payload, spark }) ->
+    spark_ref = shortid()
+    tree_worker.send
+        type: 'build_tree'
+        payload:
+            arq: arq
+            spark_ref: spark_ref
+    if spark
+        spark_check[spark_ref] = spark
+        spark.write
+            type: 'res_build_tree'
 
 
 
+keys_cc = _.keys cc
 
-keys_worker_res_api = _.keys worker_res_api
+
+tree_api = ({ type, payload }) ->
+    if _.includes(keys_cc, type)
+        cc[type] { payload }
+
+
 
 
 
@@ -139,15 +105,23 @@ start_tree_build = ->
     tree_worker = fork(path.resolve(__dirname, 'worker_prefix_tree.coffee'))
     tree_worker.on 'message', ({ type, payload }) ->
         if _.includes(keys_worker_res_api, type)
-            worker_res_api[type] { payload }
+            dd[type] { payload }
         else
             c color.yellow
 
 
+setTimeout ->
+    start_tree_build()
+, 100
+
+
+setTimeout ->
+    tree_api
+        type: 'build_tree'
+, 2000
 
 
 
-exports.default = arq
 
 
-exports.tree_lib = tree_lib
+exports.tree_api = tree_api
