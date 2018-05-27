@@ -1,14 +1,43 @@
 
 
+
+
+
+bb = {}
+
+
+bb.res_std_search = ({ payload }) ->
+    state = state.set 'results', Imm.Map(action.payload.data.payload)
+    state
+
+
+keys_bb = _.keys bb
+
+
+
+server_msg_api = ({ type, payload }) ->
+    if _.includes(keys_bb, type)
+        bb[type] { payload }
+    else
+        c color.yellow("No-op in api-res-api")
+
+
+
+
+
+
+
+
+
+
+
+
 aa = {}
 
 
-
-
 aa['primus:data'] = ({ state, action, effects_q }) ->
-    # c action.payload.data.payload
-    state = state.set 'results', Imm.Map(action.payload.data.payload)
-    state
+    { type, payload } = action.payload.data
+    server_msg_api { type, payload }
 
 
 aa.api_sc = ({ state, action, effects_q }) ->

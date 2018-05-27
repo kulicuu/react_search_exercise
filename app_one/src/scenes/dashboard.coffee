@@ -163,7 +163,8 @@ map_dispatch_to_props = (dispatch) ->
         dispatch
             type: 'api_sc'
             payload:
-                type: 'std_search'
+                # type: 'std_search'
+                type: 'tree_search'
                 payload: { search_str, search_type }
 
 
