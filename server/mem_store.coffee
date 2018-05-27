@@ -40,13 +40,14 @@ dd = {}
 
 
 dd.progress_update = ({ payload }) ->
-    { perc_count, spark_ref } = payload
-    c 'progress_update', perc_count
+    { perc_count, spark_ref, field } = payload
+    if perc_count % 10 is 0
+        c 'progress_update', perc_count
     spark = spark_check[spark_ref]
     if spark
         spark.write
             type: 'progress_update_prefix_tree_build'
-            payload: perc_count
+            payload: { perc_count, field }
 
 
 dd.match_report = ({ payload }) ->
@@ -73,27 +74,35 @@ keys_worker_res_api = _.keys dd
 cc = {}
 
 
+cc.search_tree = ({ payload, spark }) ->
+    spark_check[spark.id] = spark
+    tree_worker.send
+        type: 'search_tree'
+        payload: (fp.assign payload, {spark_ref: spark.id})
+
+
+
+
 cc.build_tree = ({ payload, spark }) ->
-    spark_ref = shortid()
     tree_worker.send
         type: 'build_tree'
         payload:
             arq: arq
-            spark_ref: spark_ref
-    if spark
-        spark_check[spark_ref] = spark
-        spark.write
-            type: 'res_build_tree'
+            spark_ref: spark.id
+    spark_check[spark.id] = spark
+    spark.write
+        type: 'res_build_tree'
 
 
 
 keys_cc = _.keys cc
 
 
-tree_api = ({ type, payload }) ->
+tree_api = ({ type, payload, spark }) ->
     if _.includes(keys_cc, type)
-        cc[type] { payload }
-
+        cc[type] { payload, spark }
+    else
+        c "no-op in tree-api with type", type
 
 
 
@@ -115,10 +124,10 @@ setTimeout ->
 , 100
 
 
-setTimeout ->
-    tree_api
-        type: 'build_tree'
-, 2000
+# setTimeout ->
+#     tree_api
+#         type: 'build_tree'
+# , 2000
 
 
 

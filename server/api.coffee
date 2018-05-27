@@ -16,6 +16,22 @@ fs = require 'fs'
 aa = {}
 
 
+aa.command_build_tree = ({ payload, spark }) ->
+    # c 'spark333', spark
+    tree_api
+        type: 'build_tree'
+        payload: null
+        spark: spark
+
+
+aa.tree_search = ({ payload, spark }) ->
+    { search_str, search_type } = payload
+    c 'treeeeeee'
+    tree_api
+        type: 'search_tree'
+        payload: { search_str, search_type }
+        spark: spark
+
 # supernaive
 aa.std_search = ({ payload, spark }) ->
     { search_str, search_type } = payload
@@ -43,7 +59,7 @@ api = ({ type, payload, spark }) ->
     if _.includes(keys_aa, type)
         aa[type] { payload, spark }
     else
-        c (color.yellow("No-op in server api with type", on)), color.purple(type, on)
+        c "no-op", type
 
 
 exports.default = api

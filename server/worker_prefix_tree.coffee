@@ -1,4 +1,4 @@
-
+# { title, gtin, gender, sale_price, price, image_link, additional_image_link }
 
 
 _ = require 'lodash'
@@ -10,17 +10,17 @@ color = require 'bash-color'
 
 
 
+tree_lib = null
 
 
 
 
 
 
-
-send_progress = ({ perc_count, spark_ref }) ->
+send_progress = ({ field, perc_count, spark_ref }) ->
     process.send
         type: 'progress_update'
-        payload: { perc_count, spark_ref }
+        payload: { field, perc_count, spark_ref }
 
 
 
@@ -86,6 +86,7 @@ aa.build_tree = ({ payload }) ->
                 perc = counter / perc_count
                 if Math.floor(counter % perc_count) is 0
                     send_progress
+                        field: field
                         perc_count: Math.floor perc
                         spark_ref: spark_ref
                 rayy = word.split ''
@@ -107,6 +108,12 @@ aa.build_tree = ({ payload }) ->
         acc33
     , {}
 
+
+
+    send_progress
+        field: 'ALL'
+        perc_count: 100
+        spark_ref: spark_ref
 
 
 

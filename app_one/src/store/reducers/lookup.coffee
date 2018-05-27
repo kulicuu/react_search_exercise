@@ -6,7 +6,20 @@
 bb = {}
 
 
-bb.res_std_search = ({ payload }) ->
+bb.progress_update_prefix_tree_build = ({ state, payload }) ->
+    { perc_count, field } = payload
+    state = state.set 'field', field
+    state = state.set 'tree_build_progress', perc_count
+    if field is 'gtin'
+        state = state.set 'title_done', true
+    if field is 'gender'
+        state = state.set 'gtin_done', true
+    if field is 'sale_price'
+        state = state.set 'gender_done', true
+    state
+
+
+bb.res_std_search = ({ state, payload }) ->
     state = state.set 'results', Imm.Map(action.payload.data.payload)
     state
 
@@ -14,11 +27,14 @@ bb.res_std_search = ({ payload }) ->
 keys_bb = _.keys bb
 
 
-server_msg_api = ({ type, payload }) ->
+
+
+server_msg_api = ({ type, payload, state, effects_q }) ->
     if _.includes(keys_bb, type)
-        bb[type] { payload }
+        bb[type] { state, payload }
     else
-        c color.yellow("No-op in api-res-api")
+        c "No-op in server_msg_api-api", type
+        state
 
 
 
@@ -36,7 +52,7 @@ aa = {}
 
 aa['primus:data'] = ({ state, action, effects_q }) ->
     { type, payload } = action.payload.data
-    server_msg_api { type, payload }
+    server_msg_api { type, payload, state, effects_q }
 
 
 aa.api_sc = ({ state, action, effects_q }) ->
