@@ -23,17 +23,12 @@ send_progress = ({ field, perc_count, spark_ref }) ->
         payload: { field, perc_count, spark_ref }
 
 
-
 send_match = ({ match_set, spark_ref }) ->
     process.send
         type: 'match_report'
         payload: { match_set, spark_ref }
 
 
-
-# This is if we will just have one entry returned, but we could also
-# use this method to return a bunch of answers in a way that would
-# work much faster over large data sets.
 map_prefix_to_match = ({ dictionary, prefix }) ->
     candidates = []
     for word in dictionary
@@ -41,9 +36,9 @@ map_prefix_to_match = ({ dictionary, prefix }) ->
             candidates.push word
         if candidates.length > 1
             # break_ties { candidates }
-            candides.pop()
+            candidates.pop()
         else
-            candides.pop()
+            candidates.pop()
 
 
 map_substring_to_match = ({ dictionary, partial_str }) ->
@@ -55,9 +50,51 @@ map_substring_to_match = ({ dictionary, partial_str }) ->
     , []
 
 
+reduce_tree = (acc, tree) ->
+    if acc.indexOf(tree.match_word) is -1
+        acc = [].concat(acc, tree.match_word)
+    _.reduce tree.chd_nodes, (acc2, node, prefx) ->
+        reduce_tree acc2, node
+    , acc
 
 
 aa = {}
+
+
+aa.search_tree = ({ payload }) ->
+    { search_str, search_type, spark_ref } = payload
+    if search_str.length is 0
+        send_match
+            spark_ref: spark_ref
+            match_set: []
+    else
+        cursor = tree_lib[search_type]
+        cancelled = false
+        unless cursor is undefined
+            search_str_rayy = search_str.split ''
+            for char in search_str_rayy
+                if cursor.chd_nodes[char] isnt undefined
+                    cursor = cursor.chd_nodes[char]
+                else
+                    cancelled = true
+                    send_match
+                        spark_ref: spark_ref
+                        match_set: []
+            if cancelled is false
+                send_match
+                    spark_ref: spark_ref
+                    match_set: reduce_tree( [], cursor )
+
+
+# # exporting for test
+# # This builds a dictionary to a tree structure.
+# exports.build_dictionary = build_dictionary = ({ dictionary }) ->
+#     tree =
+#         key: []
+#         chd_nodes: {}
+#         match_words: []
+
+
 
 
 aa.build_tree = ({ payload }) ->
@@ -67,19 +104,14 @@ aa.build_tree = ({ payload }) ->
             acc.push entry[field]
             acc
         , []
-
         tree =
             key: []
             chd_nodes: {}
             match_words: []
-
         len_dict = the_dictionary.length
         perc_count = len_dict / 100
         counter = 0
         the_dictionary.map (word, idx) ->
-
-
-
             # c field, word
             unless word is undefined
                 counter++
@@ -98,7 +130,7 @@ aa.build_tree = ({ payload }) ->
                             acc.chd_nodes[char2] =
                                 key: cursor_key
                                 chd_nodes: {}
-                                match_words: map_substring_to_match
+                                match_words: map_prefix_to_match
                                     dictionary: the_dictionary
                                     partial_str: cursor_key.join ''
                         acc = acc.chd_nodes[char2]
