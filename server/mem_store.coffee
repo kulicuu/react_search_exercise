@@ -16,24 +16,10 @@ raw_data = fs.readFileSync './products.csv', 'utf8'
 rayy = raw_data.split('\n')
 rayy.shift()
 
+
 tree_worker = null # scoped here
-
-
-
-
+arq = require('./naive_search.coffee').arq
 spark_check = {}
-
-
-
-
-arq = rayy.reduce (acc, line, idx) ->
-    [ title, gtin, gender, sale_price, price, image_link, additional_image_link ] = line.split(',')
-    acc[gtin] = { title, gtin, gender, sale_price, price, image_link, additional_image_link }
-    acc
-, {}
-
-
-c (_.size arq), 'size arq'
 
 
 dd = {}
@@ -57,20 +43,6 @@ dd.match_report = ({ payload }) ->
 keys_worker_res_api = _.keys dd
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 cc = {}
 
 
@@ -79,7 +51,6 @@ cc.search_tree = ({ payload, spark }) ->
     tree_worker.send
         type: 'search_tree'
         payload: (fp.assign payload, {spark_ref: spark.id})
-
 
 
 cc.build_table = ({ payload, spark }) ->
@@ -93,7 +64,6 @@ cc.build_table = ({ payload, spark }) ->
         type: 'res_build_tree'
 
 
-
 keys_cc = _.keys cc
 
 
@@ -102,11 +72,6 @@ tree_api = ({ type, payload, spark }) ->
         cc[type] { payload, spark }
     else
         c "no-op in tree-api with type", type
-
-
-
-
-
 
 
 start_tree_build = ->
@@ -123,13 +88,5 @@ setTimeout ->
 , 100
 
 
-# setTimeout ->
-#     tree_api
-#         type: 'build_tree'
-# , 2000
-
-
-
-
-exports.arq = require('./naive_search.coffee').arq
+exports.arq = arq
 exports.tree_api = tree_api
