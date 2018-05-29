@@ -52,7 +52,6 @@ map_prefix_to_match = ({ dictionary, prefix }) ->
 
 exports.reduce_tree = reduce_tree = (acc, tree) ->
     if acc.indexOf(tree.match_word) is -1
-        c tree.match_word, 'tree match word'
         acc = [].concat(acc, tree.match_word)
     _.reduce tree.chd_nodes, (acc2, node, prefix) ->
         reduce_tree acc2, node
@@ -85,9 +84,6 @@ aa.search_tree = ({ payload }) ->
     # search above
 
 
-
-
-
 # export for testing:
 # because I needed to decouple the constructive properties of the function from the
 # thread-associated messaging, I've factored the latter out into an injected `signal_func`.
@@ -112,8 +108,6 @@ exports.build_tree = buid_tree = ({ the_dictionary, signal_func, field, spark_re
                     field: field
                     perc_count: Math.floor perc
                     spark_ref: spark_ref
-
-
             for char, jdx in word
                 prefix+= char
                 if not _.includes(_.keys(cursor.chd_nodes), char)
@@ -127,8 +121,6 @@ exports.build_tree = buid_tree = ({ the_dictionary, signal_func, field, spark_re
     tree
 
 
-
-
 aa.build_table = ({ payload }) ->
     { arq, spark_ref } = payload
     tree_lib = _.reduce [ 'title', 'gtin', 'gender', 'sale_price', 'price', 'image_link', 'additional_image_link' ], (acc33, field, idx33) ->
@@ -136,29 +128,16 @@ aa.build_table = ({ payload }) ->
             acc.push entry[field]
             acc
         , []
-        acc33[field] = build_tree { the_dictionary }
+        acc33[field] = build_tree
+            the_dictionary: the_dictionary
+            signal_func: send_progress
+            field: field
+            spark_ref: spark_ref
         # NOTE TODO send a progress message update here.
         acc33
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 keys_aa = _.keys aa
-
-
 
 
 process.on 'message', ({ type, payload }) ->
