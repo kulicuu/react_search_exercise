@@ -131,5 +131,5 @@ setTimeout ->
 
 
 
-
+exports.arq = require('./naive_search.coffee').arq
 exports.tree_api = tree_api

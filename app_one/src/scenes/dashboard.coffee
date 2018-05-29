@@ -254,7 +254,6 @@ comp = rr
 
 
 map_state_to_props = (state) ->
-
     results: state.getIn ['lookup', 'results']
     tree_build_progress: state.getIn ['lookup', 'tree_build_progress']
     title_done: state.getIn ['lookup', 'title_done']
@@ -281,7 +280,6 @@ map_dispatch_to_props = (dispatch) ->
             type: 'api_sc'
             payload:
                 type: 'std_search'
-                # type: 'tree_search'
                 payload: { search_str, search_type }
 
 

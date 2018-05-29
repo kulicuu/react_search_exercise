@@ -1,8 +1,5 @@
 
 
-
-
-
 c = console.log.bind console
 color = require 'bash-color'
 _ = require 'lodash'
@@ -13,16 +10,11 @@ flow = require 'async'
 path = require 'path'
 
 
-
 raw_data = fs.readFileSync './products.csv', 'utf8'
 
 
 rayy = raw_data.split('\n')
-# c rayy[0]
 rayy.shift()
-
-# c rayy[0]
-
 
 
 arq = {}
@@ -30,7 +22,6 @@ arq = {}
 # create_record = ({ title, gtin, gender, sale_price, price, image_link, additional_image_link }) ->
 
 # { title, gtin, gender, sale_price, price, image_link, additional_image_link }
-
 
 
 arq = rayy.reduce (acc, line, idx) ->
@@ -41,7 +32,6 @@ arq = rayy.reduce (acc, line, idx) ->
 
 
 c (_.size arq), 'size arq'
-
 
 
 exports.arq = arq

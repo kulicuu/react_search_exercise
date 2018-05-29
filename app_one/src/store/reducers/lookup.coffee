@@ -1,8 +1,5 @@
 
 
-
-
-
 bb = {}
 
 
@@ -20,13 +17,11 @@ bb.progress_update_prefix_tree_build = ({ state, payload }) ->
 
 
 bb.res_std_search = ({ state, payload }) ->
-    state = state.set 'results', Imm.Map(action.payload.data.payload)
+    state = state.set 'results', Imm.Map(payload)
     state
 
 
 keys_bb = _.keys bb
-
-
 
 
 server_msg_api = ({ type, payload, state, effects_q }) ->
@@ -35,16 +30,6 @@ server_msg_api = ({ type, payload, state, effects_q }) ->
     else
         c "No-op in server_msg_api-api", type
         state
-
-
-
-
-
-
-
-
-
-
 
 
 aa = {}
