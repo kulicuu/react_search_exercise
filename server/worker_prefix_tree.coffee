@@ -97,7 +97,47 @@ aa.search_tree = ({ payload }) ->
 
 
 
-aa.build_tree = ({ payload }) ->
+build_tree = ({ the_dictionary }) ->
+    tree =
+        key: []
+        chd_nodes: {}
+        match_words: []
+    for word, idx in the_dictionary
+        cursor = tree
+        prefix = ''
+        if (word.length < 1) or (word is undefined)
+            # NOTE TODO send a message on build failure
+        else
+            for char, jdx in word
+                prefix+= char
+                if not _.includes(_.keys(cursor.chd_nodes), char)
+                    cursor.chd_nodes[char] =
+                        prefix: prefix
+                        chd_nodes: {}
+                        match_word: map_prefix_to_match
+                            prefix: prefix
+                            dictionary: the_dictionary
+                cursor = cursor.chd_nodes[char]
+    tree
+
+
+
+
+aa.build_table = ({ payload }) ->
+    { arq, spark_ref } = payload
+    tree_lib = _.reduce [ 'title', 'gtin', 'gender', 'sale_price', 'price', 'image_link', 'additional_image_link' ], (acc33, field, idx33) ->
+        the_dictionary = _.reduce arq, (acc, entry, id) ->
+            acc.push entry[field]
+            acc
+        , []
+        the_tree = build_tree { the_dictionary }
+        # NOTE TODO send a progress message update here.
+        acc33[field] = the_tree
+        acc33
+
+
+
+aa.build_tree_deprecated = ({ payload }) ->
     { arq, spark_ref } = payload
     tree_lib = _.reduce [ 'title', 'gtin', 'gender', 'sale_price', 'price', 'image_link', 'additional_image_link' ], (acc33, field, idx33) ->
         the_dictionary = _.reduce arq, (acc, entry, id) ->

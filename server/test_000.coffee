@@ -8,6 +8,8 @@ c = console.log.bind console
 color = require 'bash-color'
 fs = require 'fs'
 
+assert = require 'assert'
+
 
 
 
@@ -20,22 +22,13 @@ fs = require 'fs'
 map_prefix_to_match = ({ dictionary, prefix }) ->
     candides = []
     for word in dictionary
-        c word, 'word'
         if word.indexOf(prefix) is 0
-            c 'zero'
             candides.push word
-
-    c candides, 'now candides'
     if candides.length > 1
         # return break_ties { candides }
         candides.pop()
     else
         candides.pop()
-
-
-
-
-
 
 
 tree = null
@@ -44,16 +37,11 @@ tree = null
 
 
 
-
-
-
-build_dictionary3 = (the_dictionary) ->
+build_dictionary = (the_dictionary) ->
     tree =
         key: []
         chd_nodes: {}
         match_words: []
-
-
     for word, idx in the_dictionary
         cursor = tree
         prefix = ''
@@ -69,10 +57,6 @@ build_dictionary3 = (the_dictionary) ->
                             dictionary: the_dictionary
                 cursor = cursor.chd_nodes[char]
 
-    # tree
-
-
-
 
 
 
@@ -86,12 +70,6 @@ reduce_tree = (acc, tree) ->
     , acc
 
 
-
-
-
-
-
-
 search_prefix_tree = (payload) ->
     { prefix } = payload
     if prefix.length is 0
@@ -102,33 +80,27 @@ search_prefix_tree = (payload) ->
         if cursor isnt undefined
             prefix_rayy = prefix.split ''
             for char in prefix_rayy
-                c char, 'char'
-                c cursor.chd_nodes[char], 'xxxx'
                 if cursor.chd_nodes[char] isnt undefined
                     cursor = cursor.chd_nodes[char]
                 else
                     canceled = true
-                    c '23300'
                     return []
-
             if canceled is false
-                c '2333'
                 reduce_tree([], cursor)
-
-
 
 
 d1_raw = fs.readFileSync './test_dictionaries/d1.txt', 'utf8'
 d1 = d1_raw.split '\n'
-build_dictionary3 d1
+build_dictionary d1
 
 
 
-# c '\n'
-# c tree.chd_nodes
+
 
 
 s1 = search_prefix_tree
     prefix: "occ"
 
 c s1, 's1'
+
+assert s1.indexOf('occurring') > -1
