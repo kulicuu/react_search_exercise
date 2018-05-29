@@ -59,7 +59,7 @@ exports.reduce_tree = reduce_tree = (acc, tree) ->
 
 
 exports.search_prefix_tree = search_prefix_tree = ({ prefix, tree }) ->
-    if prefix.length is 0
+    if (prefix is undefined) or (prefix.length is 0)
         return []
     else
         cursor = tree
@@ -80,6 +80,7 @@ aa = {}
 
 
 aa.search_tree = ({ payload }) ->
+    c 'searcheing33344994'
     { prefix, field, spark_ref } = payload
     send_match
         spark_ref: spark_ref
@@ -92,6 +93,7 @@ aa.search_tree = ({ payload }) ->
 # because I needed to decouple the constructive properties of the function from the
 # thread-associated messaging, I've factored the latter out into an injected `signal_func`.
 exports.build_tree = build_tree = ({ the_dictionary, signal_func, field, spark_ref }) ->
+
     tree =
         key: []
         chd_nodes: {}
@@ -145,6 +147,7 @@ keys_aa = _.keys aa
 
 
 process.on 'message', ({ type, payload }) ->
+    c 'have messag', type
     if _.includes(keys_aa, type)
         aa[type] { payload }
     else

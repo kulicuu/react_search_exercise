@@ -7,18 +7,14 @@ fp = require 'lodash/fp'
 fs = require 'fs'
 
 
-# arq = require('./naive_search.coffee').default
-
-
 { tree_api, arq } = require('./mem_store.coffee')
 
 
 aa = {}
 
 
+# TODO Rename this to e.g. 'command_build_table'
 aa.command_build_tree = ({ payload, spark }) ->
-    # c 'spark333', spark
-
     tree_api
         type: 'build_table'
         payload: null
@@ -37,7 +33,6 @@ aa.std_search = ({ payload, spark }) ->
     { search_str, search_type } = payload
     c search_str, search_type
     counter = 0
-    # c 'arq', arq
     results = _.reduce arq, (acc, entry, gtin) ->
         if (entry[search_type]) and (entry[search_type].includes search_str) and (counter++ < 100)
             acc[gtin] = entry

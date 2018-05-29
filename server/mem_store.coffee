@@ -37,6 +37,7 @@ dd.progress_update = ({ payload }) ->
 
 
 dd.match_report = ({ payload }) ->
+    c 'here'
     { match_set } = payload
 
 
@@ -47,6 +48,7 @@ cc = {}
 
 
 cc.search_tree = ({ payload, spark }) ->
+    c 'searching 333'
     spark_check[spark.id] = spark
     tree_worker.send
         type: 'search_tree'
