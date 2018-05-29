@@ -50,12 +50,31 @@ map_substring_to_match = ({ dictionary, partial_str }) ->
     , []
 
 
-reduce_tree = (acc, tree) ->
+exports.reduce_tree = reduce_tree = (acc, tree) ->
     if acc.indexOf(tree.match_word) is -1
         acc = [].concat(acc, tree.match_word)
-    _.reduce tree.chd_nodes, (acc2, node, prefx) ->
+    _.reduce tree.chd_nodes, (acc2, node, prefix) ->
         reduce_tree acc2, node
     , acc
+
+
+exports.search_prefix_tree = search_prefix_tree = (payload) ->
+    { prefix } = payload
+    if prefix.length is 0
+        return []
+    else
+        cursor = tree
+        canceled = false
+        if cursor isnt undefined
+            prefix_rayy = prefix.split ''
+            for char in prefix_rayy
+                if cursor.chd_nodes[char] isnt undefined
+                    cursor = cursor.chd_nodes[char]
+                else
+                    canceled = true
+                    return []
+            if canceled is false
+                reduce_tree([], cursor)
 
 
 aa = {}
@@ -63,51 +82,38 @@ aa = {}
 
 aa.search_tree = ({ payload }) ->
     { search_str, search_type, spark_ref } = payload
-    if search_str.length is 0
-        send_match
-            spark_ref: spark_ref
-            match_set: []
-    else
-        cursor = tree_lib[search_type]
-        cancelled = false
-        unless cursor is undefined
-            search_str_rayy = search_str.split ''
-            for char in search_str_rayy
-                if cursor.chd_nodes[char] isnt undefined
-                    cursor = cursor.chd_nodes[char]
-                else
-                    cancelled = true
-                    send_match
-                        spark_ref: spark_ref
-                        match_set: []
-            if cancelled is false
-                send_match
-                    spark_ref: spark_ref
-                    match_set: reduce_tree( [], cursor )
-
-
-# # exporting for test
-# # This builds a dictionary to a tree structure.
-# exports.build_dictionary = build_dictionary = ({ dictionary }) ->
-#     tree =
-#         key: []
-#         chd_nodes: {}
-#         match_words: []
+    # search above
 
 
 
 
-build_tree = ({ the_dictionary }) ->
+
+# export for testing:
+# because I needed to decouple the constructive properties of the function from the
+# thread-associated messaging, I've factored the latter out into an injected `signal_func`.
+exports.build_tree = buid_tree = ({ the_dictionary, signal_func }) ->
     tree =
         key: []
         chd_nodes: {}
         match_words: []
+
+    len_dict = the_dictionary.length
+    perc_count = len_dict / 100
+    counter = 0
     for word, idx in the_dictionary
         cursor = tree
         prefix = ''
         if (word.length < 1) or (word is undefined)
             # NOTE TODO send a message on build failure
         else
+            perc = counter++ / perc_count
+            if Math.floor(counter % perc_count) is 0
+                signal_func
+                    field: field
+                    perc_count: Math.floor perc
+                    spark_ref: spark_ref
+
+
             for char, jdx in word
                 prefix+= char
                 if not _.includes(_.keys(cursor.chd_nodes), char)
@@ -130,62 +136,12 @@ aa.build_table = ({ payload }) ->
             acc.push entry[field]
             acc
         , []
-        the_tree = build_tree { the_dictionary }
+        acc33[field] = build_tree { the_dictionary }
         # NOTE TODO send a progress message update here.
-        acc33[field] = the_tree
         acc33
 
 
 
-aa.build_tree_deprecated = ({ payload }) ->
-    { arq, spark_ref } = payload
-    tree_lib = _.reduce [ 'title', 'gtin', 'gender', 'sale_price', 'price', 'image_link', 'additional_image_link' ], (acc33, field, idx33) ->
-        the_dictionary = _.reduce arq, (acc, entry, id) ->
-            acc.push entry[field]
-            acc
-        , []
-        tree =
-            key: []
-            chd_nodes: {}
-            match_words: []
-        len_dict = the_dictionary.length
-        perc_count = len_dict / 100
-        counter = 0
-        the_dictionary.map (word, idx) ->
-            # c field, word
-            unless word is undefined
-                counter++
-                perc = counter / perc_count
-                if Math.floor(counter % perc_count) is 0
-                    send_progress
-                        field: field
-                        perc_count: Math.floor perc
-                        spark_ref: spark_ref
-                rayy = word.split ''
-                cursor_key = []
-                rayy.map (char, idx2) ->
-                    cursor_key.push char
-                    _.reduce cursor_key, (acc, char2, idx2) ->
-                        if not acc.chd_nodes[char2]
-                            acc.chd_nodes[char2] =
-                                key: cursor_key
-                                chd_nodes: {}
-                                match_words: map_prefix_to_match
-                                    dictionary: the_dictionary
-                                    partial_str: cursor_key.join ''
-                        acc = acc.chd_nodes[char2]
-                        acc
-                    , tree
-        acc33[field] = tree
-        acc33
-    , {}
-
-
-
-    send_progress
-        field: 'ALL'
-        perc_count: 100
-        spark_ref: spark_ref
 
 
 

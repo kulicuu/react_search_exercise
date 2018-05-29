@@ -37,37 +37,17 @@ tree = null
 
 
 
-build_dictionary = (the_dictionary) ->
-    tree =
-        key: []
-        chd_nodes: {}
-        match_words: []
-    for word, idx in the_dictionary
-        cursor = tree
-        prefix = ''
-        unless word.length < 1
-            for char, jdx in word
-                prefix+= char
-                if not _.includes(_.keys(cursor.chd_nodes), char)
-                    cursor.chd_nodes[char] =
-                        prefix: prefix
-                        chd_nodes: {}
-                        match_word: map_prefix_to_match
-                            prefix: prefix
-                            dictionary: the_dictionary
-                cursor = cursor.chd_nodes[char]
 
 
 
 
 
+{ build_tree, reduce_tree, search_prefix_tree } = require('./worker_prefix_tree.coffee')
 
-reduce_tree = (acc, tree) ->
-    if acc.indexOf(tree.match_word) is -1
-        acc = [].concat(acc, tree.match_word)
-    _.reduce tree.chd_nodes, (acc2, node, prefix) ->
-        reduce_tree acc2, node
-    , acc
+
+
+
+
 
 
 search_prefix_tree = (payload) ->
