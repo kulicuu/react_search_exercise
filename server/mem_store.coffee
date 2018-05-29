@@ -82,13 +82,9 @@ cc.search_tree = ({ payload, spark }) ->
 
 
 
-
-
-
-
-cc.build_tree = ({ payload, spark }) ->
+cc.build_table = ({ payload, spark }) ->
     tree_worker.send
-        type: 'build_tree'
+        type: 'build_table'
         payload:
             arq: arq
             spark_ref: spark.id

@@ -32,7 +32,7 @@ send_match = ({ match_set, spark_ref }) ->
 map_prefix_to_match = ({ dictionary, prefix }) ->
     candidates = []
     for word in dictionary
-        unless word is ''
+        unless (word is undefined) or (word is '')
             if word.indexOf(prefix) is 0
                 candidates.push word
     if candidates.length > 1
@@ -80,14 +80,18 @@ aa = {}
 
 
 aa.search_tree = ({ payload }) ->
-    { search_str, search_type, spark_ref } = payload
-    # search above
+    { prefix, field, spark_ref } = payload
+    send_match
+        spark_ref: spark_ref
+        match_set: search_prefix_tree
+            prefix: prefix
+            tree: tree_lib[field]
 
 
 # export for testing:
 # because I needed to decouple the constructive properties of the function from the
 # thread-associated messaging, I've factored the latter out into an injected `signal_func`.
-exports.build_tree = buid_tree = ({ the_dictionary, signal_func, field, spark_ref }) ->
+exports.build_tree = build_tree = ({ the_dictionary, signal_func, field, spark_ref }) ->
     tree =
         key: []
         chd_nodes: {}
@@ -99,7 +103,7 @@ exports.build_tree = buid_tree = ({ the_dictionary, signal_func, field, spark_re
     for word, idx in the_dictionary
         cursor = tree
         prefix = ''
-        if (word.length < 1) or (word is undefined)
+        if (word is undefined) or (word.length < 1)
             # NOTE TODO send a message on build failure
         else
             perc = counter++ / perc_count

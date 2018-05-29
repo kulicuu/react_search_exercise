@@ -18,15 +18,15 @@ aa = {}
 
 aa.command_build_tree = ({ payload, spark }) ->
     # c 'spark333', spark
+
     tree_api
-        type: 'build_tree'
+        type: 'build_table'
         payload: null
         spark: spark
 
 
 aa.tree_search = ({ payload, spark }) ->
     { search_str, search_type } = payload
-    c 'treeeeeee'
     tree_api
         type: 'search_tree'
         payload: { search_str, search_type }
@@ -38,7 +38,6 @@ aa.std_search = ({ payload, spark }) ->
     c search_str, search_type
     counter = 0
     results = _.reduce arq, (acc, entry, gtin) ->
-        # c entry, 'entry'
         if (entry[search_type]) and (entry[search_type].includes search_str) and (counter++ < 100)
             acc[gtin] = entry
         acc
