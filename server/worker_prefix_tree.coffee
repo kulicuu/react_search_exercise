@@ -32,34 +32,34 @@ send_match = ({ match_set, spark_ref }) ->
 map_prefix_to_match = ({ dictionary, prefix }) ->
     candidates = []
     for word in dictionary
-        if word.indexOf(prefix) is 0
-            candidates.push word
-        if candidates.length > 1
-            # break_ties { candidates }
-            candidates.pop()
-        else
-            candidates.pop()
-
-
-map_substring_to_match = ({ dictionary, partial_str }) ->
-    dictionary.reduce (candidates, word, idx) ->
-        unless word is undefined
-            if (word.indexOf partial_str) > -1
+        unless word is ''
+            if word.indexOf(prefix) is 0
                 candidates.push word
-        candidates
-    , []
+    if candidates.length > 1
+        candidates.pop()
+    else
+        candidates.pop()
 
+
+# map_substring_to_match = ({ dictionary, partial_str }) ->
+#     dictionary.reduce (candidates, word, idx) ->
+#         unless word is undefined
+#             if (word.indexOf partial_str) > -1
+#                 candidates.push word
+#         candidates
+#     , []
+#
 
 exports.reduce_tree = reduce_tree = (acc, tree) ->
     if acc.indexOf(tree.match_word) is -1
+        c tree.match_word, 'tree match word'
         acc = [].concat(acc, tree.match_word)
     _.reduce tree.chd_nodes, (acc2, node, prefix) ->
         reduce_tree acc2, node
     , acc
 
 
-exports.search_prefix_tree = search_prefix_tree = (payload) ->
-    { prefix } = payload
+exports.search_prefix_tree = search_prefix_tree = ({ prefix, tree }) ->
     if prefix.length is 0
         return []
     else
@@ -91,7 +91,7 @@ aa.search_tree = ({ payload }) ->
 # export for testing:
 # because I needed to decouple the constructive properties of the function from the
 # thread-associated messaging, I've factored the latter out into an injected `signal_func`.
-exports.build_tree = buid_tree = ({ the_dictionary, signal_func }) ->
+exports.build_tree = buid_tree = ({ the_dictionary, signal_func, field, spark_ref }) ->
     tree =
         key: []
         chd_nodes: {}
